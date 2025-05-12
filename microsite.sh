@@ -1,14 +1,7 @@
-    #!/bin/bash
-
-    # Tasks
-    # 1. Generate a random name
-    # 2. Create a directory and WordPress Installation
-    # 3. Add Database and DB Prefix to this script
-    # 4. Install WP CLI and Activate The Plugin
-    # 5. Create a crontab for the wp system
+#!/bin/bash
 
     # Variables
-    MainDir="/var/www/html"
+    MainDir="/srv/www/wordpress"
 
     source .env
 
@@ -26,29 +19,23 @@
     }
 
     create_directory() {
-        dir_name=$1
+        dir_name=$(random_name)
         mkdir -p "$MainDir/$dir_name"
-        echo "Directory $MainDir/$dir_name created."
+        cd "$MainDir/$dir_name"
+        echo "$MainDir/$dir_name"
     }
 
+        create_directory
+
     if [ $(which wp &> /dev/null; echo $?) -eq 0 ]; then
-        wp core download --path="$MainDir/$name" --allow-root
+        wp core download --allow-root
         sleep 30
-        wp config create --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --dbpass="$WORDPRESS_DB_PASSWORD" --dbhost=172.31.17.176:3306 --dbprefix=helloWorld_ --skip-check --force
+        wp config create --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --dbpass="$WORDPRESS_DB_PASSWORD" --dbhost="$WORDPRESS_DB_HOST" --dbprefix="$(random_name)_" --skip-check --force --allow-root
         sleep 30
-        wp core install --url="http://$name.local" --title="$name" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" --skip-email
+        wp core install --url="$WORDPRESS_URL/$(random_name)" --title="Buckbeak" --admin_user="$(random_name)" --admin_password="$(random_name)@9448" --admin_email="savalaelliott@gmail.com" --skip-email --allow-root
         sleep 30
-        wp plugin install woocommerce tourfic --activate
+        wp plugin install woocommerce tourfic --activate --allow-root
 
     else
         echo "wp command is not available"
     fi
-
-
-
-    # wp_cli_install() {
-        
-    # }
-
-    name=$(random_name)
-    echo "Random name generated: $name"
